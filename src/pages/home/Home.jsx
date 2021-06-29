@@ -12,7 +12,8 @@ export default function Home() {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const res = await axios.get("/posts" + search);
+      const res = await axios.get("https://nameless-brook-14832.herokuapp.com/api/posts"+ search );
+      console.log(res.data)
       setPosts(res.data);
     };
     fetchPosts();

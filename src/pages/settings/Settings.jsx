@@ -5,14 +5,30 @@ import { Context } from "../../context/Context";
 import axios from "axios";
 
 export default function Settings() {
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState('');
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [success, setSuccess] = useState(false);
 
   const { user, dispatch } = useContext(Context);
-  const PF = "http://localhost:5000/images/"
+  
+
+  const handleimageupload =(e)=>{
+      console.log(e.target.files[0])
+      const imageData= new FormData();
+      imageData.set("key","9449f7590d01050c0f4ba35c8a7e0bb0")
+      imageData.append('image',e.target.files[0])
+
+      axios.post('https://api.imgbb.com/1/upload', imageData)
+      .then(function (response) {
+        console.log(response.data.data.display_url);
+        setFile(response.data.data.display_url);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,17 +38,9 @@ export default function Settings() {
       username,
       email,
       password,
+      'profilePic':file
     };
-    if (file) {
-      const data = new FormData();
-      const filename = Date.now() + file.name;
-      data.append("name", filename);
-      data.append("file", file);
-      updatedUser.profilePic = filename;
-      try {
-        await axios.post("/upload", data);
-      } catch (err) {}
-    }
+  
     try {
       const res = await axios.put("/users/" + user._id, updatedUser);
       setSuccess(true);
@@ -52,7 +60,7 @@ export default function Settings() {
           <label>Profile Picture</label>
           <div className="settingsPP">
             <img
-              src={file ? URL.createObjectURL(file) : PF+user.profilePic}
+              src={file || user.profilePic}
               alt=""
             />
             <label htmlFor="fileInput">
@@ -62,7 +70,7 @@ export default function Settings() {
               type="file"
               id="fileInput"
               style={{ display: "none" }}
-              onChange={(e) => setFile(e.target.files[0])}
+              onChange={handleimageupload}
             />
           </div>
           <label>Username</label>

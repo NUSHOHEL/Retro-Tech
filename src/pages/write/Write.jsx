@@ -9,23 +9,32 @@ export default function Write() {
   const [file, setFile] = useState(null);
   const { user } = useContext(Context);
 
+
+
+  const handleimageupload =(e)=>{
+    console.log(e.target.files[0])
+    const imageData= new FormData();
+    imageData.set("key","9449f7590d01050c0f4ba35c8a7e0bb0")
+    imageData.append('image',e.target.files[0])
+
+    axios.post('https://api.imgbb.com/1/upload', imageData)
+    .then(function (response) {
+      console.log(response.data.data.display_url);
+      setFile(response.data.data.display_url);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+}
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newPost = {
       username: user.username,
       title,
       desc,
+      "photo":file
     };
-    if (file) {
-      const data =new FormData();
-      const filename = Date.now() + file.name;
-      data.append("name", filename);
-      data.append("file", file);
-      newPost.photo = filename;
-      try {
-        await axios.post("/upload", data);
-      } catch (err) {}
-    }
     try {
       const res = await axios.post("/posts", newPost);
       window.location.replace("/post/" + res.data._id);
@@ -34,7 +43,7 @@ export default function Write() {
   return (
     <div className="write">
       {file && (
-        <img className="writeImg" src={URL.createObjectURL(file)} alt="" />
+        <img className="writeImg" src={file} alt="" />
       )}
       <form className="writeForm" onSubmit={handleSubmit}>
         <div className="writeFormGroup">
@@ -45,7 +54,7 @@ export default function Write() {
             type="file"
             id="fileInput"
             style={{ display: "none" }}
-            onChange={(e) => setFile(e.target.files[0])}
+            onChange={handleimageupload}
           />
           <input
             type="text"
