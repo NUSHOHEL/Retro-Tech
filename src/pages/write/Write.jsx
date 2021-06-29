@@ -36,7 +36,7 @@ export default function Write() {
       "photo":file
     };
     try {
-      const res = await axios.post("/posts", newPost);
+      const res = await axios.post("https://nameless-brook-14832.herokuapp.com/api/posts", newPost);
       window.location.replace("/post/" + res.data._id);
     } catch (err) {}
   };
